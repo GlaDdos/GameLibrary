@@ -1,64 +1,49 @@
 import React, { Component } from 'react';
 import { hashHistory } from 'react-router';
-import { Form } from '../components';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 
-export default class AddGameContainer extends Component {
+import { Form } from '../components';
+import * as gamesActionCreators from '../action/games';
+import * as filestackActionCreators from '../action/filestack';
+
+class AddGameContainer extends Component {
   constructor (props){
     super(props);
 
-    this.state = { newGame: {}};
-
     this.submit = this.submit.bind(this);
     this.uploadPicture = this.uploadPicture.bind(this);
-    this.setGame = this.setGame.bind(this);
   }
 
-  submit(){
-    const newGame = Object.assign({}, { picture: $('#picture').attr('src') }, this.state.newGame );
-    fetch('http://localhost:8080/games', {
-      headers: new Headers({
-        'Content-Type': 'application/json'
-      }),
-      method: 'POST',
-      body: JSON.stringify(newGame)
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log(data.message);
-      hashHistory.push('/games');
-    });
+  submit(event){
+    event.peventDefault();
+
+    this.props.gamesActions.postGame();
+    hashHistory.push('/games');
   }
 
   uploadPicture() {
-    filepicker.pick(
-      {
-        mimetype: 'image/*',
-        container: 'modal',
-        services: ['COMPUTER', 'FACEBOOK', 'INSTAGRAM', 'URL', 'IMGUR', 'PICASA'],
-        openTo: 'COMPUTER'
-      },
-      function (Blob) {
-        console.log(JSON.stringify(Blob));
-        $('#picture').attr('src', Blob.url);
-      },
-      function(FPError){
-        console.log(FPError.toString());
-      }
-    );
+    this.props.filestackActions.uploadPicture();
   }
 
-  setGame(){
-    const newGame = {
-      name: document.getElementById('name').value,
-      description: document.getElementById('description').value,
-      year: document.getElementById('year').value,
-      picture: $('#picture').attr('src')
-    };
-
-    this.setState({ newGame });
-  }
 
   render(){
-    return <Form submit={this.submit} uploadPicture={this.uploadPicture} setGame={this.setGame} />
+    const { picture } = this.props;
+    return <Form submit={this.submit} picture={picture} uploadPicture={this.uploadPicture} />
   }
 }
+
+function mapStateToProps (state) {
+  return {
+    picture: state.getIn(['filestack', 'ulr'], '')
+  };
+}
+
+function mapDispatchToProps(dispatch){
+  return {
+    gamesActions: bindActionCreators(gamesActionCreators, dispatch),
+    filestackActions: bindActionCreators(filestackActionCreators, dispatch)
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddGameContainer);

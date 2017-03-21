@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import Immutable from 'immutable';
+
+import * as gamesActionCreators from '../action/games';
 import { Modal, GameListManager } from '../components';
 
-export default class GamesContainer extends Component {
+class GamesContainer extends Component {
   constructor (props) {
-    super(props);
-
-    this.state = { games: [], selectedGame: {}, searchBar: '' };
+    super();
 
     this.toggleModal = this.toggleModal.bind(this);
     this.deleteGame = this.deleteGame.bind(this);
@@ -17,40 +20,24 @@ export default class GamesContainer extends Component {
   }
 
   toggleModal(index){
-    this.setState({ selectedGame: this.state.games[index] });
+    this.props.gamesActions.showSelectedGame(this.props.games[index]);
     $('#game-modal').modal();
   }
 
   getGames(){
-    fetch('http://localhost:8080/games', {
-      headers: new Headers({
-        'Content-Type': 'application/json'
-      })
-    })
-    .then(response => response.json())
-    .then(data => this.setState({ games: data }));
+    this.props.gamesActions.getGames();
   }
 
   deleteGame(id){
-    fetch(`http://localhost:8080/games/${id}`, {
-      headers: new Headers({
-        'Content-Type': 'application/json'
-      }),
-      method: 'DELETE'
-    })
-    .then( response => response.json())
-    .then( response => {
-      this.setState({ games: this.state.games.filter( game => game._id !== id) });
-      console.log(response.message);
-    });
+    this.props.gamesActions.deleteGame(id);
   }
 
   setSearchBar (event) {
-    this.setState({ searchBar: event.target.value.toLowerCase() });
+    this.props.gamesActions.setSearchBar(event.target.value.toLowerCase());
   }
 
   render () {
-    const { games, selectedGame, searchBar } = this.state;
+    const { games, searchBar, selectedGame } = this.props;
 
     return (
       <div>
@@ -66,3 +53,19 @@ export default class GamesContainer extends Component {
     );
   }
 }
+
+function mapStateToProps (state) {
+  return {
+    games: state.getIn(['games', 'list'], Immutable.List()).toJS(),
+    searchBar: state.getIn(['games', 'searchBar'], ''),
+    selectedGame: state.getIn(['games', 'selectedGame'], Immutable.List()).toJS()
+  }
+}
+
+function mapDispatchToProps (dispatch) {
+  return {
+    gamesActions: bindActionCreators(gamesActionCreators, dispatch)
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(GamesContainer);

@@ -39,3 +39,4 @@ export default class GameListManager extends PureComponent {
     );
   }
 }
+// TODO: there are two documents in db which have no name field, might be wwhy undefined error in toLowerCase is showing

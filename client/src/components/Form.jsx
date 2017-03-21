@@ -1,8 +1,10 @@
 import React, { PureComponent } from 'react';
 import { Link } from 'react-router';
+import { Field, reduxForm } from 'redux-form/immutable';
 
-export default class Form extends PureComponent {
+class Form extends PureComponent {
   render(){
+    const { picture, uploadPicture } = this.props;
     return(
       <div className="row scrollable">
         <div className="col-md-offset-2 col-md-8">
@@ -14,24 +16,42 @@ export default class Form extends PureComponent {
               <h2 className="panel-title text-center">Add a Game!</h2>
             </div>
             <div className="panel-body">
-              <form name="product-form" action="" onSubmit={() => this.props.submit()} noValidate>
+              <form name="product-form" action="" onSubmit={this.props.handleSubmit}>
                 <div className="form-group text-left">
                   <label htmlFor="caption">Name</label>
-                  <input id="name" type="text" className="form-control" placeholder="Enter the title od the game." onChange={() => this.props.setGame()} />
+                  <Field
+                    name="name"
+                    type="text"
+                    className="form-control"
+                    component="input"
+                    placeholder="Enter the title of the game."
+                  />
                 </div>
                 <div className="form-group text-left">
                   <label htmlFor="description">Description</label>
-                  <textarea id="description" type="text" className="form-control" placeholder="Enter the description" rows="5" onChange={() => this.props.setGame()}></textarea>
+                  <Field
+                    name="description"
+                    component="textarea"
+                    className="form-control"
+                    placeholder="Enter the description"
+                    rows="10"
+                  />
                 </div>
                 <div className="form-group text-left">
                   <label htmlFor="year">Year</label>
-                  <input id="year" type="number" className="form-control" placeholder="Enter the year" onChange={() => this.props.setGame()} />
+                  <Field
+                    name="year"
+                    component="input"
+                    type="number"
+                    className="form-control"
+                    placeholder="Enter the year"
+                  />
                 </div>
                 <div className="form-group text-left">
                   <label htmlFor="picture">Picture</label>
                   <div className="text-center dropup">
-                    <button id="button-upload" type="button" className="btn btn-danger" onClick={() => this.props.uploadPicture()}>
-                      Uload <span className="caret" />
+                    <button id="button-upload" type="button" className="btn btn-danger" onClick={() => uploadPicture()}>
+                      Upload <span className="caret" />
                     </button>
                   </div>
                 </div>
@@ -47,3 +67,5 @@ export default class Form extends PureComponent {
     );
   }
 }
+
+export default reduxForm({ form: 'game' })(Form);
