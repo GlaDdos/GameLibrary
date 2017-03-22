@@ -1,4 +1,4 @@
-import { takeLatest, delay } from 'redux-saga';
+import { takeLatest } from 'redux-saga';
 import {  put, select, call } from 'redux-saga/effects';
 
 import { GET_GAMES, DELETE_GAME, POST_GAME } from '../constants/games';

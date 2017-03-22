@@ -16,7 +16,7 @@ class AddGameContainer extends Component {
   }
 
   submit(event){
-    event.peventDefault();
+    event.preventDefault();
 
     this.props.gamesActions.postGame();
     hashHistory.push('/games');
@@ -29,7 +29,7 @@ class AddGameContainer extends Component {
 
   render(){
     const { picture } = this.props;
-    return <Form submit={this.submit} picture={picture} uploadPicture={this.uploadPicture} />
+    return <Form handleSubmit={this.submit} picture={picture} uploadPicture={this.uploadPicture} />
   }
 }
 
